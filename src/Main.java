@@ -3,10 +3,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CyclicBarrier;
 
-public class Main extends Thread {
+public class Main {
     static List<Item> items = new ArrayList<>();
-
-    static double totalCombinado = 0;
 
     public static double truncNumber(double number, int decimalPlaces) {
         double multiplier = Math.pow(10, decimalPlaces);
@@ -26,13 +24,6 @@ public class Main extends Thread {
         }
         System.out.println("Total esperado: " + truncNumber(totalEsperado, 4));
     }
-
-    public static void exibirTotais(List<Item> items) {
-        for (Item item : items) {
-            System.out.println(item.getTotal());
-        }
-    }
-
 
     public static List<List<Item>> sliceList(int T){
         int sizeOfList = items.size();
@@ -57,21 +48,27 @@ public class Main extends Thread {
     }
 
     public static void processamento(int T){
+        Result result = new Result();
+
         Runnable barrierAction = new Runnable() {
             public void run() {
-                System.out.println("Total combinado de todas as threads: " + truncNumber(totalCombinado, 4));
+                result.displayResultOfGrups();
+                System.out.println("Total combinado de todas as threads: " +
+                        Main.truncNumber(result.getTotalCombinado(), 4));
             }
         };
+
         CyclicBarrier barrier = new CyclicBarrier(T, barrierAction);
         List<List<Item>> partitions = sliceList(T);
         for(int i = 0; i < T; i++){
-            ItemProcess threadItemProcess = new ItemProcess("Thread " + i, barrier, partitions.get(i));
+            ItemProcess threadItemProcess = new ItemProcess(
+                    "Thread " + i, barrier, partitions.get(i), result);
             threadItemProcess.start();
         }
     }
 
     public static void main(String[] args) {
-        carregamento(7);
+        carregamento(2);
         processamento(2);
     }
 }

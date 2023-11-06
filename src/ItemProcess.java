@@ -8,27 +8,46 @@ public class ItemProcess extends Thread{
     private List<Item> items = new ArrayList<>();
     private double total = 0;
     private List<Double> totalsByGroup = new ArrayList<>();
+    private Result result;
 
-    public ItemProcess(String name, CyclicBarrier barrier, List<Item> items ) {
+    public ItemProcess(String name, CyclicBarrier barrier, List<Item> items, Result result) {
         super(name);
         this.barrier = barrier;
         this.items = items;
+        this.result = result;
     }
 
+    private void addToResultsIdsWithTotalLessThanFIVE(Item item) {
+        if(item.getTotal() < 5) {
+            result.addIdWithTotalLessThanFIVE(item.getId());
+        }
+    }
 
+    private void addToResultsTotalByGroup(Item item) {
+        result.addTotalByGroup(item.getTotal(), item.getGrupo() - 1);
+    }
+
+    private void addToResultsTotalCombinado(double subtotal) {
+        result.addTotalCombinado(subtotal);
+    }
 
     @Override
     public void run() {
         try {
+            String threadLogName = getName();
+            double subtotal = 0;
             for (Item item : items) {
-                this.total += item.getTotal();
+                subtotal += item.getTotal();
+                addToResultsIdsWithTotalLessThanFIVE(item);
+                addToResultsTotalByGroup(item);
+                Displayer.logIndividualItem(threadLogName, item);
             }
+            addToResultsTotalCombinado(subtotal);
 
-            synchronized (Main.class) {
-                Main.totalCombinado += this.total;
-            }
+            Displayer.logTotalOfItems(threadLogName, items);
+            Displayer.logTotalByGroup(threadLogName, items);
+            Displayer.logIdsWithTotalLessThanFive(threadLogName, items);
 
-            System.out.println("Thread " + getName() + " " + "Subtotal: " + Main.truncNumber(this.total, 4));
             barrier.await();
 
             System.out.println("Thread " + this.getName() + " released.");
