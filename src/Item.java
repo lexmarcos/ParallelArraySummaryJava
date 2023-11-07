@@ -17,7 +17,7 @@ public class Item {
         return total;
     }
 
-    public int getGrupo() {
+    public int getGroup() {
         return grupo;
     }
 }

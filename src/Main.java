@@ -4,31 +4,30 @@ import java.util.Random;
 import java.util.concurrent.CyclicBarrier;
 
 public class Main {
-    static List<Item> items = new ArrayList<>();
+    static List<Item> itemList = new ArrayList<>();
 
-    public static double truncNumber(double number, int decimalPlaces) {
+    public static double truncateNumber(double number, int decimalPlaces) {
         double multiplier = Math.pow(10, decimalPlaces);
         return Math.floor(multiplier * number) / multiplier;
     }
 
-    public static void carregamento(int N) {
-        double totalEsperado = 0;
+    public static void loadData(int N) {
+        double expectedTotal = 0;
         Random rand = new Random();
-        for(int i=0; i<Math.pow(10, N); i++) {
+        for(int i = 0; i < Math.pow(10, N); i++) {
+            double total = truncateNumber(rand.nextDouble() * 10, 4);
+            expectedTotal += total;
 
-            double total = truncNumber(rand.nextDouble() * 10, 4);
-            totalEsperado += total;
-
-            int grupo = rand.nextInt(5) + 1;
-            items.add(new Item(i, total, grupo));
+            int group = rand.nextInt(5) + 1;
+            itemList.add(new Item(i, total, group));
         }
-        System.out.println("Total esperado: " + truncNumber(totalEsperado, 4));
+        System.out.println("Expected total: " + truncateNumber(expectedTotal, 4));
     }
 
-    public static List<List<Item>> sliceList(int T){
-        int sizeOfList = items.size();
-        int partSize = sizeOfList/ T;
-        int remainder = sizeOfList % T;
+    public static List<List<Item>> partitionList(int numberOfThreads){
+        int sizeOfList = itemList.size();
+        int partSize = sizeOfList / numberOfThreads;
+        int remainder = sizeOfList % numberOfThreads;
         List<List<Item>> partitions = new ArrayList<>();
 
         for (int i = 0; i < sizeOfList; i += partSize) {
@@ -36,39 +35,44 @@ public class Main {
             if (remainder > 0) {
                 end++;
                 remainder--;
-                partitions.add(new ArrayList<>(items.subList(i, end)));
-                i++;
-            }else{
-                partitions.add(new ArrayList<>(items.subList(i, end)));
             }
-
-
+            partitions.add(new ArrayList<>(itemList.subList(i, end)));
+            if (remainder > 0) i++;
         }
         return partitions;
     }
 
-    public static void processamento(int T){
+    public static void processItems(int numberOfThreads){
+        System.out.println("Starting " + numberOfThreads + " threads.");
         Result result = new Result();
-
-        Runnable barrierAction = new Runnable() {
-            public void run() {
-                result.displayResultOfGrups();
-                System.out.println("Total combinado de todas as threads: " +
-                        Main.truncNumber(result.getTotalCombinado(), 4));
-            }
-        };
-
-        CyclicBarrier barrier = new CyclicBarrier(T, barrierAction);
-        List<List<Item>> partitions = sliceList(T);
-        for(int i = 0; i < T; i++){
-            ItemProcess threadItemProcess = new ItemProcess(
+        long startTime = System.nanoTime();
+        CyclicBarrier barrier = getCyclicBarrier(numberOfThreads, startTime, result);
+        List<List<Item>> partitions = partitionList(numberOfThreads);
+        for(int i = 0; i < numberOfThreads; i++){
+            ItemProcessor threadItemProcessor = new ItemProcessor(
                     "Thread " + i, barrier, partitions.get(i), result);
-            threadItemProcess.start();
+            threadItemProcessor.start();
         }
     }
 
+    private static CyclicBarrier getCyclicBarrier(int numberOfThreads, long startTime, Result result) {
+        Runnable barrierAction = () -> {
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+
+            double seconds = (double)duration / 1_000_000_000.0;
+            System.out.println("Tempo de execução: " + seconds + " segundos.");
+
+            result.displayGroupResults();
+            System.out.println("Combined total from all threads: " +
+                    Main.truncateNumber(result.getCombinedTotal(), 4));
+        };
+
+        return new CyclicBarrier(numberOfThreads, barrierAction);
+    }
+
     public static void main(String[] args) {
-        carregamento(2);
-        processamento(2);
+        loadData(5);
+        processItems(4);
     }
 }

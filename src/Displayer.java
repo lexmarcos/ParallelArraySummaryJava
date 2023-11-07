@@ -23,31 +23,34 @@ public class Displayer {
         writeToLogFile(threadName + "_log.txt", "\nTotal dos Itens: " + total);
     }
 
-    public static void logTotalByGroup(String threadName, List<Item> items) {
-        Map<Integer, Double> totalByGroup = items.stream()
-                .collect(Collectors.groupingBy(
-                        Item::getGrupo,
-                        Collectors.summingDouble(Item::getTotal)));
-
-        totalByGroup.forEach((group, total) ->
-                writeToLogFile(threadName + "_log.txt", "Grupo " + group + " Total: " + total));
+    public static void logTotalByGroup(String threadName, List<Double> groupTotals) {
+        for (int i = 0; i < groupTotals.size(); i++) {
+            System.out.println("Group size " + groupTotals.size());
+            writeToLogFile(threadName + "_log.txt", "Grupo " + (i + 1) + ": " + groupTotals.get(i));
+        }
     }
 
-    public static void logIdsWithTotalLessThanFive(String threadName, List<Item> items) {
-        List<Integer> ids = items.stream()
-                .filter(item -> item.getTotal() < 5)
-                .map(Item::getId)
-                .collect(Collectors.toList());
 
-        writeToLogFile(threadName + "_log.txt", "\nIDs com Total < 5: " + ids + "\n");
+    public static void logIdsWithTotalLessThanFive(String threadName, List<Integer> values) {
+        List<Integer> filteredValues = values.stream()
+                .toList();
+
+        writeToLogFile(threadName + "_log.txt", "\nValores < 5: " + filteredValues + "\n");
+    }
+
+    public static void logIdsWithTotalMoreThanFive(String threadName, List<Integer> values) {
+        List<Integer> filteredValues = values.stream()
+                .toList();
+
+        writeToLogFile(threadName + "_log.txt", "\nValores > 5: " + filteredValues + "\n");
     }
 
     public static void logIndividualItem(String threadName, Item item) {
         String itemDetails =
                 "----------------------\n" +
-                        "Item ID: " + item.getId() + "\n" +
-                        "Total: " + item.getTotal() + "\n" +
-                        "Grupo: " + item.getGrupo();
+                "Item ID: " + item.getId() + "\n" +
+                "Total: " + item.getTotal() + "\n" +
+                "Grupo: " + item.getGroup();
 
         writeToLogFile(threadName + "_log.txt", itemDetails);
     }
