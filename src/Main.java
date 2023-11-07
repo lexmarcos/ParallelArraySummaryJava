@@ -46,7 +46,9 @@ public class Main {
         System.out.println("Starting " + numberOfThreads + " threads.");
         Result result = new Result();
         long startTime = System.nanoTime();
+
         CyclicBarrier barrier = getCyclicBarrier(numberOfThreads, startTime, result);
+
         List<List<Item>> partitions = partitionList(numberOfThreads);
         for(int i = 0; i < numberOfThreads; i++){
             ItemProcessor threadItemProcessor = new ItemProcessor(
@@ -61,7 +63,7 @@ public class Main {
             long duration = endTime - startTime;
 
             double seconds = (double)duration / 1_000_000_000.0;
-            System.out.println("Tempo de execução: " + seconds + " segundos.");
+            System.out.println("Process time: " + seconds + " seconds.");
 
             result.displayGroupResults();
             System.out.println("Combined total from all threads: " +
@@ -73,6 +75,6 @@ public class Main {
 
     public static void main(String[] args) {
         loadData(5);
-        processItems(4);
+        processItems(1);
     }
 }

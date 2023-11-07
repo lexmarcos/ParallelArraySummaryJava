@@ -53,7 +53,7 @@ public class ItemProcessor extends Thread {
         try {
             String threadLogName = getName();
             double subtotal = 0;
-            boolean saveLogs = false;
+            boolean isToSaveLogs = false;
 
             List<Integer> idsWithTotalLessThanFive = new ArrayList<>();
             List<Integer> idsWithTotalMoreThanFive = new ArrayList<>();
@@ -65,14 +65,14 @@ public class ItemProcessor extends Thread {
                 addToResultsIfTotalLessThanFive(item, idsWithTotalLessThanFive);
                 addToResultsIfTotalMoreThanFive(item, idsWithTotalMoreThanFive);
                 addToResultsTotalByGroup(item, totalsByGroup);
-                if(saveLogs){
+                if(isToSaveLogs){
                     Displayer.logIndividualItem(threadLogName, item);
                 }
             }
             addToResultsIdsWithLessAndMoreThanFive(idsWithTotalLessThanFive, idsWithTotalMoreThanFive);
             addToResultsCombinedTotal(subtotal);
 
-            if(saveLogs){
+            if(isToSaveLogs){
                 saveLogs(idsWithTotalLessThanFive,
                         idsWithTotalMoreThanFive, totalsByGroup);
             }
