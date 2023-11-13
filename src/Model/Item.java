@@ -1,3 +1,5 @@
+package Model;
+
 public class Item {
     private int id;
     private double total;

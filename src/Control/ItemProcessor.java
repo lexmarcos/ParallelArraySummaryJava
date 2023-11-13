@@ -1,3 +1,10 @@
+package Control;
+
+import Model.Item;
+import Model.Result;
+import Utils.Displayer;
+import Utils.UtilsFunctions;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
@@ -33,7 +40,7 @@ public class ItemProcessor extends Thread {
 
     private void addToResultsTotalByGroup(Item item, List<Double> totalsByGroup) {
         result.addTotalByGroup(item.getTotal(), item.getGroup());
-        Utils.addToArrayOfTotalsByGroup(totalsByGroup, item.getTotal(), item.getGroup());
+        UtilsFunctions.addToArrayOfTotalsByGroup(totalsByGroup, item.getTotal(), item.getGroup());
     }
 
     private void addToResultsCombinedTotal(double subtotal) {

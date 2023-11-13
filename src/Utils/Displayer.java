@@ -1,6 +1,9 @@
+package Utils;
+
+import Control.Loader;
+import Model.Item;
+
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,6 +33,11 @@ public class Displayer {
         }
     }
 
+    public static void displayGroupResults(List<Double> totalsByGroup) {
+        for (int i = 0; i < totalsByGroup.size(); i++) {
+            System.out.println("📊 Group " + (i + 1) + ": " + Loader.truncateNumber(totalsByGroup.get(i), 4));
+        }
+    }
 
     public static void logIdsWithTotalLessThanFive(String threadName, int idsWithTotalLessThanFive) {
         writeToLogFile(threadName + "_log.txt", "\nIds With Total Less Than Five: " + idsWithTotalLessThanFive + "\n");

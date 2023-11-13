@@ -1,3 +1,8 @@
+package Model;
+
+import Control.Loader;
+import Utils.UtilsFunctions;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +31,18 @@ public class Result {
     }
 
     public synchronized void addTotalByGroup(double total, int group) {
-        Utils.addToArrayOfTotalsByGroup(totalsByGroup, total, group);
+        UtilsFunctions.addToArrayOfTotalsByGroup(totalsByGroup, total, group);
     }
 
-    public void displayGroupResults() {
-        for (int i = 0; i < totalsByGroup.size(); i++) {
-            System.out.println("Group " + (i + 1) + ": " + Main.truncateNumber(totalsByGroup.get(i), 4));
-        }
+    public int getIdsWithTotalLessThanFive() {
+        return idsWithTotalLessThanFive;
+    }
+
+    public int getIdsWithTotalMoreThanFive() {
+        return idsWithTotalMoreThanFive;
+    }
+
+    public List<Double> getTotalsByGroup() {
+        return totalsByGroup;
     }
 }
