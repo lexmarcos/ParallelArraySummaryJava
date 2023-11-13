@@ -31,18 +31,12 @@ public class Displayer {
     }
 
 
-    public static void logIdsWithTotalLessThanFive(String threadName, List<Integer> values) {
-        List<Integer> filteredValues = values.stream()
-                .toList();
-
-        writeToLogFile(threadName + "_log.txt", "\nValores < 5: " + filteredValues + "\n");
+    public static void logIdsWithTotalLessThanFive(String threadName, int idsWithTotalLessThanFive) {
+        writeToLogFile(threadName + "_log.txt", "\nIds With Total Less Than Five: " + idsWithTotalLessThanFive + "\n");
     }
 
-    public static void logIdsWithTotalMoreThanFive(String threadName, List<Integer> values) {
-        List<Integer> filteredValues = values.stream()
-                .toList();
-
-        writeToLogFile(threadName + "_log.txt", "\nValores > 5: " + filteredValues + "\n");
+    public static void logIdsWithTotalMoreThanFive(String threadName, int idsWithTotalMoreThanFive) {
+        writeToLogFile(threadName + "_log.txt", "\nIds With Total More Than Five: " + idsWithTotalMoreThanFive + "\n");
     }
 
     public static void logIndividualItem(String threadName, Item item) {

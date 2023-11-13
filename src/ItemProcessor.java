@@ -15,16 +15,20 @@ public class ItemProcessor extends Thread {
         this.result = result;
     }
 
-    private void addToResultsIfTotalLessThanFive(Item item, List<Integer> idsWithTotalLessThanFive) {
+    private int addToResultsIfTotalLessThanFive(Item item, int idsWithTotalLessThanFive) {
         if (item.getTotal() < 5) {
-            idsWithTotalLessThanFive.add(item.getId());
+            idsWithTotalLessThanFive++;
+            return idsWithTotalLessThanFive;
         }
+        return idsWithTotalLessThanFive;
     }
 
-    private void addToResultsIfTotalMoreThanFive(Item item, List<Integer> idsWithTotalMoreThanFive) {
+    private int addToResultsIfTotalMoreThanFive(Item item, int idsWithTotalMoreThanFive) {
         if(item.getTotal() > 5) {
-            idsWithTotalMoreThanFive.add(item.getId());
+            idsWithTotalMoreThanFive++;
+            return idsWithTotalMoreThanFive;
         }
+        return idsWithTotalMoreThanFive;
     }
 
     private void addToResultsTotalByGroup(Item item, List<Double> totalsByGroup) {
@@ -36,12 +40,12 @@ public class ItemProcessor extends Thread {
         result.addCombinedTotal(subtotal);
     }
 
-    private void addToResultsIdsWithLessAndMoreThanFive(List<Integer> idsWithTotalLessThanFive, List<Integer> idsWithTotalMoreThanFive){
-        result.addIdsWithTotalMoreThanFive(idsWithTotalMoreThanFive);
-        result.addIdsWithTotalLessThanFive(idsWithTotalLessThanFive);
+    private void addToResultsIdsWithLessAndMoreThanFive(){
+        result.addIdsWithTotalMoreThanFive();
+        result.addIdsWithTotalLessThanFive();
     }
 
-    private void saveLogs(List<Integer> idsWithTotalLessThanFive, List<Integer> idsWithTotalMoreThanFive, List<Double> totalsByGroup){
+    private void saveLogs(int idsWithTotalLessThanFive, int idsWithTotalMoreThanFive, List<Double> totalsByGroup){
         Displayer.logTotalOfItems(getName(), items);
         Displayer.logTotalByGroup(getName(), totalsByGroup);
         Displayer.logIdsWithTotalLessThanFive(getName(), idsWithTotalLessThanFive);
@@ -55,21 +59,22 @@ public class ItemProcessor extends Thread {
             double subtotal = 0;
             boolean isToSaveLogs = false;
 
-            List<Integer> idsWithTotalLessThanFive = new ArrayList<>();
-            List<Integer> idsWithTotalMoreThanFive = new ArrayList<>();
+            int idsWithTotalLessThanFive = 0;
+            int idsWithTotalMoreThanFive = 0;
 
             List<Double> totalsByGroup = new ArrayList<>();
 
             for (Item item : items) {
                 subtotal += item.getTotal();
-                addToResultsIfTotalLessThanFive(item, idsWithTotalLessThanFive);
-                addToResultsIfTotalMoreThanFive(item, idsWithTotalMoreThanFive);
+                idsWithTotalLessThanFive = addToResultsIfTotalLessThanFive(item, idsWithTotalLessThanFive);
+                idsWithTotalMoreThanFive = addToResultsIfTotalMoreThanFive(item, idsWithTotalMoreThanFive);
                 addToResultsTotalByGroup(item, totalsByGroup);
+
                 if(isToSaveLogs){
                     Displayer.logIndividualItem(threadLogName, item);
                 }
             }
-            addToResultsIdsWithLessAndMoreThanFive(idsWithTotalLessThanFive, idsWithTotalMoreThanFive);
+            addToResultsIdsWithLessAndMoreThanFive();
             addToResultsCombinedTotal(subtotal);
 
             if(isToSaveLogs){
@@ -78,8 +83,6 @@ public class ItemProcessor extends Thread {
             }
 
             barrier.await();
-
-            System.out.println("Thread " + this.getName() + " released.");
         } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
         }

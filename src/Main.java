@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.CyclicBarrier;
 
 public class Main {
@@ -45,7 +46,7 @@ public class Main {
     public static void processItems(int numberOfThreads){
         System.out.println("Starting " + numberOfThreads + " threads.");
         Result result = new Result();
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
 
         CyclicBarrier barrier = getCyclicBarrier(numberOfThreads, startTime, result);
 
@@ -59,11 +60,10 @@ public class Main {
 
     private static CyclicBarrier getCyclicBarrier(int numberOfThreads, long startTime, Result result) {
         Runnable barrierAction = () -> {
-            long endTime = System.nanoTime();
+            long endTime = System.currentTimeMillis();
             long duration = endTime - startTime;
 
-            double seconds = (double)duration / 1_000_000_000.0;
-            System.out.println("Process time: " + seconds + " seconds.");
+            System.out.println("Process time: " + duration + " ms.");
 
             result.displayGroupResults();
             System.out.println("Combined total from all threads: " +
@@ -74,7 +74,15 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        loadData(5);
-        processItems(1);
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter N (power for inserts): ");
+        int N = scanner.nextInt();
+
+        System.out.print("Enter T (number of threads): ");
+        int T = scanner.nextInt();
+
+        loadData(N);
+        processItems(T);
     }
 }
